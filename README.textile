@@ -1,0 +1,13 @@
+h1. Route server
+
+Server and javascript client for marking places on the new kartverket wms.
+
+usage
+
+rake db:create:all
+rake db:migrate
+
+rake spec
+
+script/server
+
