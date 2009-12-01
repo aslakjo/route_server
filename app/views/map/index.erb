@@ -3,6 +3,7 @@
     <%= stylesheet_link_tag "style" %>
     <%= javascript_include_tag("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js") %>
     <%= javascript_include_tag("openlayers") %>
+    <%= javascript_include_tag("http://json.org/json2.js") %>
 
 
   </head>
@@ -12,9 +13,47 @@
 
     <script type="text/javascript">
 
-      $(document).ready(function(){
-        //$.post("<%= new_place_path %>",  {place: '{ "title": "title", "description": "description", "point": { "lat": "10.0000" , "lng": "60.60"}}'})
+      OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
+        defaultHandlerOptions: {
+          'single': true,
+          'double': false,
+          'pixelTolerance': 0,
+          'stopSingle': false,
+          'stopDouble': false
+        },
 
+        initialize: function(closjure) {
+          console.debug(closjure)
+          this.closjure = closjure
+          this.handlerOptions = OpenLayers.Util.extend(
+            {}, this.defaultHandlerOptions
+          );
+          OpenLayers.Control.prototype.initialize.apply(
+            this, arguments
+          );
+          this.handler = new OpenLayers.Handler.Click(
+            this, {
+              'click': this.trigger
+            }, this.handlerOptions
+          );
+        },
+
+        trigger: function(e) {
+          var lonlat = map.getLonLatFromViewPortPx(e.xy);
+          console.debug("clicket her "+  lonlat.lon + " " + lonlat.lat)
+          this.closjure(lonlat.lon, lonlat.lat)
+        }
+
+      });
+
+      function newMarkerAt(lat, lon){
+        var size = new OpenLayers.Size(10,17);
+        var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+        var icon = new OpenLayers.Icon('http://boston.openguides.org/markers/AQUA.png',size,offset);
+        return new OpenLayers.Marker(new OpenLayers.LonLat(lat,lon),icon);
+      }
+
+      $(document).ready(function(){
         map = new OpenLayers.Map('map_window');
 
         var rasterLayer = new OpenLayers.Layer.WMS(
@@ -22,12 +61,34 @@
         "http://openwms.statkart.no/skwms1/wms.toporaster2",
         {layers: "topografiskraster"});
 
-        map.addLayers([rasterLayer])
+       
+        var click = new OpenLayers.Control.Click(function(lat, lon){
+          console.debug("via closure " + lat + " " + lon)
+
+          var place = JSON.stringify({ title: "testtitle", description: "testdescription", point:{lat:lat, lng:lon}})
+          console.debug(place)
+          $.post("<%= new_place_path %>",  {"place": place });
+        });
+        map.addControl(click);
+        click.activate();
+
+        var markers = new OpenLayers.Layer.Markers("Makrører", {transparent: true})
+
+        $.getJSON("<%= place_index_path %>", function(data){
+          $.each(data, function(index,item){
+            console.debug(item)
+            markers.addMarker(newMarkerAt(item.place.point.lat, item.place.point.lng));
+          })
+        });
+
+        markers.addMarker(newMarkerAt(10.675964,59.960167));
+
+        map.addLayers([markers, rasterLayer])
 
         map.addControl(new OpenLayers.Control.Attribution());
 
         //59.960167,10.675964
-        map.setCenter(new OpenLayers.LonLat(10.675964, 59.960167), 16)
+        map.setCenter(new OpenLayers.LonLat(10.675964, 59.960167), 10)
       })
 
     </script>
