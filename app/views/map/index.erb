@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <%= stylesheet_link_tag "style" %>
+    <%= javascript_include_tag("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js") %>
+    <%= javascript_include_tag("openlayers") %>
+
+
+  </head>
+
+  <body>
+
+
+    <script type="text/javascript">
+
+      $(document).ready(function(){
+        //$.post("<%= new_place_path %>",  {place: '{ "title": "title", "description": "description", "point": { "lat": "10.0000" , "lng": "60.60"}}'})
+
+        map = new OpenLayers.Map('map_window');
+
+        var rasterLayer = new OpenLayers.Layer.WMS(
+        "Rasterkart",
+        "http://openwms.statkart.no/skwms1/wms.toporaster2",
+        {layers: "topografiskraster"});
+
+        map.addLayers([rasterLayer])
+
+        map.addControl(new OpenLayers.Control.Attribution());
+
+        //59.960167,10.675964
+        map.setCenter(new OpenLayers.LonLat(10.675964, 59.960167), 16)
+      })
+
+    </script>
+    <div id="map_window">
+
+    </div>
+  </body>
+</html>
