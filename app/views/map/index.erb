@@ -1,11 +1,10 @@
 <html>
   <head>
+    <title>Route server test site</test>
     <%= stylesheet_link_tag "style" %>
     <%= javascript_include_tag("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js") %>
     <%= javascript_include_tag("openlayers") %>
     <%= javascript_include_tag("http://json.org/json2.js") %>
-
-
   </head>
 
   <body>
@@ -49,7 +48,7 @@
       function newMarkerAt(lat, lon){
         var size = new OpenLayers.Size(10,17);
         var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-        var icon = new OpenLayers.Icon('http://boston.openguides.org/markers/AQUA.png',size,offset);
+        var icon = new OpenLayers.Icon('/img/marker.png',size,offset);
         return new OpenLayers.Marker(new OpenLayers.LonLat(lat,lon),icon);
       }
 
@@ -58,7 +57,7 @@
 
         var rasterLayer = new OpenLayers.Layer.WMS(
         "Rasterkart",
-        "http://openwms.statkart.no/skwms1/wms.toporaster2",
+        "http://opencache.statkart.no/gatekeeper/gk/gk.open?layers=topo2&",
         {layers: "topografiskraster"});
 
        
