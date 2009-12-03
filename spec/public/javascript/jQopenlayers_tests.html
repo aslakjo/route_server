@@ -23,7 +23,20 @@
 
                     ok($("#test_map").css("height") == "600px", "wrong height")
                     ok($("#test_map").css("width") == "800px", "wrong width")
-                })
+                });
+
+
+                module("using a layer")
+                test("the norwegian kartverks topo2 layer", function(){
+                    $("#test_map").openlayers_map({source : "http://opencache.statkart.no/gatekeeper/gk/gk.open?layers=topo2&", layer: "topografiskraster"})
+
+                    found_one = false
+                    $("#test_map img").each(function(){
+                        found_one = found_one || $(this).attr("src").match("^http://opencache\.statkart\.no") != null
+                    })
+
+                    ok(found_one, "No img is from statkart")
+                });
 
             });
         </script>

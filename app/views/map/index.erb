@@ -5,13 +5,13 @@
     <%= javascript_include_tag("http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js") %>
     <%= javascript_include_tag("openlayers") %>
     <%= javascript_include_tag("http://json.org/json2.js") %>
-  </head>
+</head>
 
-  <body>
+<body>
 
 
-    <script type="text/javascript">
-
+  <script type="text/javascript">
+    $(document).ready(function(){
       OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
         defaultHandlerOptions: {
           'single': true,
@@ -25,16 +25,16 @@
           console.debug(closjure)
           this.closjure = closjure
           this.handlerOptions = OpenLayers.Util.extend(
-            {}, this.defaultHandlerOptions
-          );
+          {}, this.defaultHandlerOptions
+        );
           OpenLayers.Control.prototype.initialize.apply(
-            this, arguments
-          );
+          this, arguments
+        );
           this.handler = new OpenLayers.Handler.Click(
-            this, {
-              'click': this.trigger
-            }, this.handlerOptions
-          );
+          this, {
+            'click': this.trigger
+          }, this.handlerOptions
+        );
         },
 
         trigger: function(e) {
@@ -52,47 +52,47 @@
         return new OpenLayers.Marker(new OpenLayers.LonLat(lat,lon),icon);
       }
 
-      $(document).ready(function(){
-        map = new OpenLayers.Map('map_window');
+      
+      map = new OpenLayers.Map('map_window');
 
-        var rasterLayer = new OpenLayers.Layer.WMS(
-        "Rasterkart",
-        "http://opencache.statkart.no/gatekeeper/gk/gk.open?layers=topo2&",
-        {layers: "topografiskraster"});
+      var rasterLayer = new OpenLayers.Layer.WMS(
+      "Rasterkart",
+      "http://opencache.statkart.no/gatekeeper/gk/gk.open?layers=topo2&",
+      {layers: "topografiskraster"});
 
        
-        var click = new OpenLayers.Control.Click(function(lat, lon){
-          console.debug("via closure " + lat + " " + lon)
+      var click = new OpenLayers.Control.Click(function(lat, lon){
+        console.debug("via closure " + lat + " " + lon)
 
-          var place = JSON.stringify({ title: "testtitle", description: "testdescription", point:{lat:lat, lng:lon}})
-          console.debug(place)
-          $.post("<%= new_place_path %>",  {"place": place });
-        });
-        map.addControl(click);
-        click.activate();
+        var place = JSON.stringify({ title: "testtitle", description: "testdescription", point:{lat:lat, lng:lon}})
+        console.debug(place)
+        $.post("<%= new_place_path %>",  {"place": place });
+      });
+      map.addControl(click);
+      click.activate();
 
-        var markers = new OpenLayers.Layer.Markers("Makrører", {transparent: true})
+      var markers = new OpenLayers.Layer.Markers("Makrører", {transparent: true})
 
-        $.getJSON("<%= place_index_path %>", function(data){
-          $.each(data, function(index,item){
-            console.debug(item)
-            markers.addMarker(newMarkerAt(item.place.point.lat, item.place.point.lng));
-          })
-        });
+      $.getJSON("<%= place_index_path %>", function(data){
+        $.each(data, function(index,item){
+          console.debug(item)
+          markers.addMarker(newMarkerAt(item.place.point.lat, item.place.point.lng));
+        })
+      });
 
-        markers.addMarker(newMarkerAt(10.675964,59.960167));
+      markers.addMarker(newMarkerAt(10.675964,59.960167));
 
-        map.addLayers([markers, rasterLayer])
+      map.addLayers([markers, rasterLayer])
 
-        map.addControl(new OpenLayers.Control.Attribution());
+      map.addControl(new OpenLayers.Control.Attribution());
 
-        //59.960167,10.675964
-        map.setCenter(new OpenLayers.LonLat(10.675964, 59.960167), 10)
-      })
+      //59.960167,10.675964
+      map.setCenter(new OpenLayers.LonLat(10.675964, 59.960167), 10)
+    })
 
-    </script>
-    <div id="map_window">
+  </script>
+  <div id="map_window">
 
-    </div>
-  </body>
+  </div>
+</body>
 </html>
